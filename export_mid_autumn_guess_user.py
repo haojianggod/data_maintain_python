@@ -23,6 +23,7 @@ import json
 class ExportMidAutumnGuessUser(BaseTask, BaseExport):
     def __init__(self, start_time, end_time, thread_cnt):
         BaseTask.__init__(self, "exportMidAutumnGuess", thread_cnt=thread_cnt)
+        BaseExport.__init__(self)
 
         self.disp = Hd_play_info_disp({"timeStamp": {"$gte": start_time, "$lte": end_time},
                                        "hdId": "MidAutumnGuest"})
