@@ -220,7 +220,7 @@ class TimeConver(object):
     def getTodayStr(cls):
         "20160102"
         now = time.localtime()
-        return "%04d%02d%02d" % (now.tm_year, now.tm_mon, now.tm_hour)
+        return "%04d%02d%02d" % (now.tm_year, now.tm_mon, now.tm_day)
 
 
 if __name__ == '__main__':
