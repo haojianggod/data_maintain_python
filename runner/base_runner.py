@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+# -*- coding:utf8 -*-
+
+#__author__ == 'godlikeme'
+
+class BaseRunner(object):
+    pass
