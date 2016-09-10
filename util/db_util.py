@@ -38,7 +38,7 @@ class Coupon_item_db_util(Base_db_util):
         super(Coupon_item_db_util, self).__init__(DBConfig.COUPON2B_STOCK_DB_URL, "coupon2b_stock", "coupon_item")
 
     def get_define_id_by_id(self, _id):
-        doc = self.collection.find_one({"_id", _id})
+        doc = self.collection.find_one({"_id": _id})
         if not doc:
             return
         return doc.get("couponDefineId","")
