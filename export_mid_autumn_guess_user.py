@@ -53,12 +53,12 @@ class ExportMidAutumnGuessUser(BaseTask, BaseExport):
         shopId = job["shopId"]
         hdId = job["hdId"]
 
-        receiveCouponDefineIds = []
         with self.define_ids_lock:
             if shopId not in self.coupon2b_define_ids:
                 receiveCouponDefineIds = self.get_coupon_defineIds(shopId)
+                self.append_to_coupon2b_define_ids(shopId, receiveCouponDefineIds)
 
-        self.append_to_rs(shopId, [hdId, json.dumps(receiveCouponDefineIds, ensure_ascii=False)])
+        self.append_to_rs(shopId, hdId)
         print "[+] export shoId: %s, hdId: %s" % (shopId, hdId)
 
     def get_coupon_defineIds(self, shopId):
@@ -84,7 +84,7 @@ class ExportMidAutumnGuessUser(BaseTask, BaseExport):
 
     def end_operation(self, *args, **kwargs):
         for key, value in self.rs.items():
-            self.save_file.append_row([key, value[0], value[1]])
+            self.save_file.append_row([key, value, self.coupon2b_define_ids[key]])
 
 
 def printUsage():
