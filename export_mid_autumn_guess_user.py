@@ -56,6 +56,8 @@ class ExportMidAutumnGuessUser(BaseTask, BaseExport):
         with self.define_ids_lock:
             if shopId not in self.coupon2b_define_ids:
                 receiveCouponDefineIds = self.get_coupon_defineIds(shopId)
+                if not receiveCouponDefineIds:
+                    print "get_coupon_defineIds, result empty, shopId: %s" % shopId
                 self.append_to_coupon2b_define_ids(shopId, receiveCouponDefineIds)
 
         self.append_to_rs(shopId, hdId)
