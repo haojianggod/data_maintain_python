@@ -44,6 +44,7 @@ class ExportMidAutumnGuessUser(BaseTask):
         hdId = job["hdId"]
 
         self.append_to_rs(shopId, hdId)
+        print "[+] export shoId: %s, hdId: %s" % (shopId, hdId)
 
     def end_operation(self, *args, **kwargs):
         for key, value in self.rs.items():
