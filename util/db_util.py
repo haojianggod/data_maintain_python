@@ -28,7 +28,7 @@ class Coupon_receive_info_db_util(Base_db_util):
         super(Coupon_receive_info_db_util, self).__init__(DBConfig.COUPON2B_STOCK_DB_URL, "coupon2b_stock", "coupon_receive_info")
 
     def getIdsByConsumerId(self, consumeId):
-        docs = self.collection.find({"consumeId": consumeId})
+        docs = self.collection.find({"consumerId": consumeId})
         rs = [doc["_id"] for doc in docs]
         return rs
 
