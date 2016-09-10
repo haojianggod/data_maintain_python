@@ -70,6 +70,8 @@ class ExportMidAutumnGuessUser(BaseTask, BaseExport):
             defineId, ok = self.is_guess_coupon(receiveCouponId)
             if ok:
                 receiveCouponDefineIds.append(defineId)
+            else:
+                print "is_guess_coupon, result false, receivCouponId: %s, definID: %s" % (receiveCouponId, defineId)
 
         return receiveCouponDefineIds
 
