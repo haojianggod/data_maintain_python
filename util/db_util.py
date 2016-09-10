@@ -29,6 +29,9 @@ class Coupon_receive_info_db_util(Base_db_util):
 
     def getIdsByConsumerId(self, consumeId):
         docs = self.collection.find({"consumerId": consumeId})
+        if not docs:
+            print "getIdsByConsumerId empty result, shopId: %s" % consumeId
+
         rs = [doc["_id"] for doc in docs]
         return rs
 
