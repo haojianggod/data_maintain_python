@@ -14,10 +14,13 @@ from dispatcher.hd_play_info_disp import Hd_play_info_disp
 from util.file_util import CsvFile
 from util.other_util import TimeConver
 from threading import RLock
+from base_export import BaseExport
 import sys
+import json
 
 
-class ExportMidAutumnGuessUser(BaseTask):
+
+class ExportMidAutumnGuessUser(BaseTask, BaseExport):
     def __init__(self, start_time, end_time, thread_cnt):
         BaseTask.__init__(self, "exportMidAutumnGuess", thread_cnt=thread_cnt)
 
@@ -25,7 +28,7 @@ class ExportMidAutumnGuessUser(BaseTask):
                                        "hdId": "MidAutumnGuest"})
 
         self.save_file = CsvFile("data/%s_%s.csv" % (self._name, TimeConver.getTodayStr()))
-        self.save_file.set_header(['shopId', 'hdId'])
+        self.save_file.set_header(['shopId', 'hdId', "coupon2b_define_ids"])
         self.rs = {}
         self.rs_lock = RLock()
 
@@ -43,12 +46,31 @@ class ExportMidAutumnGuessUser(BaseTask):
         shopId = job["shopId"]
         hdId = job["hdId"]
 
-        self.append_to_rs(shopId, hdId)
+
+        receiveCouponDefineIds = []
+        receiveCouponIds = self.coupon_receive_info_db_util.getIdsByConsumerId(shopId)
+        for receiveCouponId in receiveCouponIds:
+            defineId, ok = self.is_guess_coupon(receiveCouponId)
+            if ok:
+                receiveCouponDefineIds.append(defineId)
+
+        self.append_to_rs(shopId, [hdId, json.dumps(receiveCouponDefineIds, ensure_ascii=False)])
         print "[+] export shoId: %s, hdId: %s" % (shopId, hdId)
+
+    def is_guess_coupon(self, couponId):
+
+        coupon_define_id = self.coupon_item_db_util.get_define_id_by_id(couponId)
+        if not coupon_define_id:
+            return coupon_define_id, False
+
+        if self.coupon2b_define_db_util.check_ReceiveRuleType_with_id(coupon_define_id, "MidAutumnGuessRule"):
+            return coupon_define_id, True
+
+        return coupon_define_id, False
 
     def end_operation(self, *args, **kwargs):
         for key, value in self.rs.items():
-            self.save_file.append_row([key, value])
+            self.save_file.append_row([key, value[0], value[1]])
 
 
 def printUsage():
