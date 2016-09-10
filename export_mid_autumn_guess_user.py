@@ -31,11 +31,17 @@ class ExportMidAutumnGuessUser(BaseTask, BaseExport):
         self.save_file = CsvFile("data/%s_%s.csv" % (self._name, TimeConver.getTodayStr()))
         self.save_file.set_header(['shopId', 'hdId', "coupon2b_define_ids"])
         self.rs = {}
+        self.coupon2b_define_ids = {}
         self.rs_lock = RLock()
+        self.define_ids_lock = RLock()
 
     def append_to_rs(self, key, value):
         with self.rs_lock:
             self.rs[key] = value
+
+    def append_to_coupon2b_define_ids(self, key, value):
+        with self.define_ids_lock:
+            self.coupon2b_define_ids[key] = value
 
     def dispatcher(self, q):
         self.disp.dipatcher(q)
@@ -47,7 +53,15 @@ class ExportMidAutumnGuessUser(BaseTask, BaseExport):
         shopId = job["shopId"]
         hdId = job["hdId"]
 
+        receiveCouponDefineIds = []
+        with self.define_ids_lock:
+            if shopId not in self.coupon2b_define_ids:
+                receiveCouponDefineIds = self.get_coupon_defineIds(shopId)
 
+        self.append_to_rs(shopId, [hdId, json.dumps(receiveCouponDefineIds, ensure_ascii=False)])
+        print "[+] export shoId: %s, hdId: %s" % (shopId, hdId)
+
+    def get_coupon_defineIds(self, shopId):
         receiveCouponDefineIds = []
         receiveCouponIds = self.coupon_receive_info_db_util.getIdsByConsumerId(shopId)
         for receiveCouponId in receiveCouponIds:
@@ -55,8 +69,7 @@ class ExportMidAutumnGuessUser(BaseTask, BaseExport):
             if ok:
                 receiveCouponDefineIds.append(defineId)
 
-        self.append_to_rs(shopId, [hdId, json.dumps(receiveCouponDefineIds, ensure_ascii=False)])
-        print "[+] export shoId: %s, hdId: %s" % (shopId, hdId)
+        return receiveCouponDefineIds
 
     def is_guess_coupon(self, couponId):
 
